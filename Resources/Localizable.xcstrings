@@ -32698,13 +32698,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use remark as display name"
+            "value" : "Use remark as copy name"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "用备注作为显示名"
+            "value" : "用备注作为副本名"
           }
         }
       }
@@ -32715,13 +32715,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, the app list title uses the remark instead of the original name, making it easier to tell apart multiple identical apps."
+            "value" : "When enabled, duplicates show the remark as the per-copy name after the app name (e.g. \"WeChat · Work\") instead of the auto \"Copy N\" suffix. The original app name is always kept."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开启后，应用列表标题将使用备注代替原名称，便于区分多个相同的应用。"
+            "value" : "开启后，同名副本将以备注作为区分名显示在应用名之后（如「微信 · 工作号」），取代自动的「副本 N」。应用本名始终保留。"
           }
         }
       }

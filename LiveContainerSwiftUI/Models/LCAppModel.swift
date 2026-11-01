@@ -120,7 +120,8 @@ class LCAppModel: ObservableObject, Hashable {
         }
     }
 
-    /// When enabled, the app list title uses the remark instead of the original display name.
+    /// When enabled, the remark becomes the per-copy display name (alias) for duplicates
+    /// instead of the auto "Copy N" suffix. The app's original name is always kept.
     @Published var uiUseRemarkAsName : Bool {
         didSet {
             appInfo.useRemarkAsName = uiUseRemarkAsName
@@ -156,14 +157,20 @@ class LCAppModel: ObservableObject, Hashable {
         }
     }
 
-    /// The name shown on the app banner. Uses the remark as the title when
-    /// `uiUseRemarkAsName` is enabled and a remark is present, otherwise the original name.
+    /// The name shown on the app banner.
+    /// For duplicates, a per-copy alias is appended after the app's original name:
+    /// the remark (when "use remark as copy name" is on) or the auto "Copy N" suffix.
+    /// The original app name is always kept (never replaced by the remark).
     public var uiDisplayName: String {
         get {
-            if uiUseRemarkAsName, !uiRemark.isEmpty {
-                return uiRemark
+            let name = displayName
+            if uiDuplicateTotal > 1 {
+                if uiUseRemarkAsName, !uiRemark.isEmpty {
+                    return "\(name) · \(uiRemark)"
+                }
+                return "\(name) · \("lc.appBanner.duplicateCopy".loc) \(uiDuplicateIndex)"
             }
-            return displayName
+            return name
         }
     }
     

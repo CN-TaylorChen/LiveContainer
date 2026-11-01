@@ -154,21 +154,18 @@ final class LCAppBannerRootView: UIView {
 
         iconImageView.image = icon
 
-        // Title: use remark as display name when enabled, otherwise the original name.
-        // Append a "Copy N" suffix when this app shares its name with others.
-        let baseName = model.uiDisplayName
-        if model.uiDuplicateTotal > 1 {
-            nameLabel.text = "\(baseName) · \("lc.appBanner.duplicateCopy".loc) \(model.uiDuplicateIndex)"
-        } else {
-            nameLabel.text = baseName
-        }
+        // Title always keeps the app's original name. For duplicates, a per-copy alias is
+        // appended (remark as copy name, or the auto "Copy N" suffix) — handled by uiDisplayName.
+        nameLabel.text = model.uiDisplayName
         nameLabel.textColor = .label
 
         versionLabel.text = "\(model.version) - \(model.bundleIdentifier)"
         versionLabel.textColor = textColor
+        // Hide the remark subtitle when it already appears in the title as the copy alias.
+        let remarkUsedAsTitle = model.uiDuplicateTotal > 1 && model.uiUseRemarkAsName && !model.uiRemark.isEmpty
         remarkLabel.text = model.uiRemark
         remarkLabel.textColor = textColor.withAlphaComponent(0.8)
-        remarkLabel.isHidden = model.uiRemark.isEmpty
+        remarkLabel.isHidden = model.uiRemark.isEmpty || remarkUsedAsTitle
         containerLabel.text = model.uiSelectedContainer?.name ?? "lc.appBanner.noDataFolder".loc
         containerLabel.textColor = textColor
 
