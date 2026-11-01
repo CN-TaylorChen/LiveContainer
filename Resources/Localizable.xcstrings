@@ -32674,6 +32674,57 @@
           }
         }
       }
+    },
+    "lc.appBanner.duplicateCopy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "副本"
+          }
+        }
+      }
+    },
+    "lc.appSettings.useRemarkAsName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use remark as display name"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用备注作为显示名"
+          }
+        }
+      }
+    },
+    "lc.appSettings.useRemarkAsNameDesc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, the app list title uses the remark instead of the original name, making it easier to tell apart multiple identical apps."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启后，应用列表标题将使用备注代替原名称，便于区分多个相同的应用。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -491,7 +491,34 @@ struct LCAppListView : View, LCAppBannerDelegate, LCAppModelDelegate {
         for app in sharedModel.hiddenApps {
             app.delegate = self
         }
+        recomputeDuplicateIndices()
         didAppear = true
+    }
+
+    /// Groups all apps (visible + hidden) by bundle identifier and assigns an
+    /// in-memory 1-based `uiDuplicateIndex` / `uiDuplicateTotal` to each so the
+    /// banner can show a "Copy N" suffix and a colored badge for identical apps.
+    func recomputeDuplicateIndices() {
+        let allApps = sharedModel.apps + sharedModel.hiddenApps
+        var groups: [String: [LCAppModel]] = [:]
+        for app in allApps {
+            let key = app.appInfo.bundleIdentifier() ?? app.displayName
+            groups[key, default: []].append(app)
+        }
+        for (_, apps) in groups {
+            if apps.count > 1 {
+                let sorted = apps.sorted {
+                    ($0.appInfo.installationDate ?? .distantPast) < ($1.appInfo.installationDate ?? .distantPast)
+                }
+                for (i, app) in sorted.enumerated() {
+                    app.uiDuplicateIndex = i + 1
+                    app.uiDuplicateTotal = sorted.count
+                }
+            } else if let app = apps.first {
+                app.uiDuplicateIndex = 0
+                app.uiDuplicateTotal = 0
+            }
+        }
     }
     
     
@@ -776,6 +803,7 @@ struct LCAppListView : View, LCAppBannerDelegate, LCAppModelDelegate {
             }
 
             self.installprogressVisible = false
+            recomputeDuplicateIndices()
         }
     }
     
@@ -977,7 +1005,7 @@ struct LCAppListView : View, LCAppBannerDelegate, LCAppModelDelegate {
             sharedModel.hiddenApps.removeAll { now in
                 return app == now
             }
-            
+            recomputeDuplicateIndices()
         }
     }
     
@@ -1002,7 +1030,7 @@ struct LCAppListView : View, LCAppBannerDelegate, LCAppModelDelegate {
                 UserDefaults.lcShared().mutableArrayValue(forKey: "LCGuestURLSchemes")
                     .addObjects(from: app.appInfo.urlSchemes() as! [Any])
             }
-            
+            recomputeDuplicateIndices()
         }
     }
     

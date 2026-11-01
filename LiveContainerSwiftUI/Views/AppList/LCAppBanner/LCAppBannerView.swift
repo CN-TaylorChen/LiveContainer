@@ -21,6 +21,7 @@ final class LCAppBannerRootView: UIView {
     private let jitBadge = LCAppBannerBadgeView(symbolName: "bolt.fill")
     private let lockBadge = LCAppBannerBadgeView(symbolName: "lock.fill")
     private let bit32Badge = LCAppBannerBadgeView(text: "32")
+    private let duplicateBadge = UILabel()
     private let nameSpacer = UIView()
     private let nameStack = UIStackView()
     private let detailStack = UIStackView()
@@ -62,6 +63,15 @@ final class LCAppBannerRootView: UIView {
         configureLabel(remarkLabel, font: .systemFont(ofSize: 10))
         configureLabel(containerLabel, font: .systemFont(ofSize: 8))
 
+        duplicateBadge.translatesAutoresizingMaskIntoConstraints = false
+        duplicateBadge.font = .systemFont(ofSize: 11, weight: .bold)
+        duplicateBadge.textColor = .white
+        duplicateBadge.textAlignment = .center
+        duplicateBadge.layer.cornerRadius = 10
+        duplicateBadge.clipsToBounds = true
+        duplicateBadge.isHidden = true
+        duplicateBadge.isAccessibilityElement = false
+
         nameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         nameLabel.setContentHuggingPriority(.required, for: .horizontal)
         nameSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -94,6 +104,7 @@ final class LCAppBannerRootView: UIView {
         addSubview(iconImageView)
         addSubview(detailStack)
         addSubview(runControl)
+        addSubview(duplicateBadge)
 
         NSLayoutConstraint.activate([
             visualBackgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -113,7 +124,12 @@ final class LCAppBannerRootView: UIView {
             runControl.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -14),
             runControl.centerYAnchor.constraint(equalTo: centerYAnchor),
             runControl.widthAnchor.constraint(equalToConstant: 70),
-            runControl.heightAnchor.constraint(equalToConstant: 32)
+            runControl.heightAnchor.constraint(equalToConstant: 32),
+
+            duplicateBadge.widthAnchor.constraint(equalToConstant: 20),
+            duplicateBadge.heightAnchor.constraint(equalToConstant: 20),
+            duplicateBadge.trailingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 3),
+            duplicateBadge.bottomAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 3)
         ])
     }
 
@@ -137,8 +153,17 @@ final class LCAppBannerRootView: UIView {
         let textColor = Self.readableTextColor(for: accentColor, traitCollection: traitCollection)
 
         iconImageView.image = icon
-        nameLabel.text = model.displayName
+
+        // Title: use remark as display name when enabled, otherwise the original name.
+        // Append a "Copy N" suffix when this app shares its name with others.
+        let baseName = model.uiDisplayName
+        if model.uiDuplicateTotal > 1 {
+            nameLabel.text = "\(baseName) · \("lc.appBanner.duplicateCopy".loc) \(model.uiDuplicateIndex)"
+        } else {
+            nameLabel.text = baseName
+        }
         nameLabel.textColor = .label
+
         versionLabel.text = "\(model.version) - \(model.bundleIdentifier)"
         versionLabel.textColor = textColor
         remarkLabel.text = model.uiRemark
@@ -146,6 +171,20 @@ final class LCAppBannerRootView: UIView {
         remarkLabel.isHidden = model.uiRemark.isEmpty
         containerLabel.text = model.uiSelectedContainer?.name ?? "lc.appBanner.noDataFolder".loc
         containerLabel.textColor = textColor
+
+        // Duplicate visual differentiation: colored ring + numbered badge on the icon.
+        if model.uiDuplicateTotal > 1 {
+            let dupColor = Self.duplicateColor(index: model.uiDuplicateIndex)
+            iconImageView.layer.borderWidth = 3
+            iconImageView.layer.borderColor = dupColor.cgColor
+            duplicateBadge.isHidden = false
+            duplicateBadge.text = "\(model.uiDuplicateIndex)"
+            duplicateBadge.backgroundColor = dupColor
+        } else {
+            iconImageView.layer.borderWidth = 0
+            iconImageView.layer.borderColor = nil
+            duplicateBadge.isHidden = true
+        }
 
         sharedBadge.isHidden = !model.uiIsShared
         sharedBadge.backgroundColor = UIColor(named: "BadgeColor") ?? .systemOrange
@@ -166,12 +205,21 @@ final class LCAppBannerRootView: UIView {
             isEnabled: !model.isAppRunning
         )
 
-        var accessibilityParts = [model.displayName, "\(model.version) - \(model.bundleIdentifier)"]
+        var accessibilityParts = [model.uiDisplayName, "\(model.version) - \(model.bundleIdentifier)"]
         if !model.uiRemark.isEmpty {
             accessibilityParts.append(model.uiRemark)
         }
         accessibilityParts.append(model.uiSelectedContainer?.name ?? "lc.appBanner.noDataFolder".loc)
         detailStack.accessibilityLabel = accessibilityParts.joined(separator: ", ")
+    }
+
+    private static func duplicateColor(index: Int) -> UIColor {
+        let palette: [UIColor] = [
+            .systemRed, .systemBlue, .systemGreen, .systemOrange,
+            .systemPurple, .systemTeal, .systemPink, .systemIndigo
+        ]
+        guard index > 0 else { return .systemRed }
+        return palette[(index - 1) % palette.count]
     }
 
     private static func extractMainHueColor(appInfo: LCAppInfo, icon: UIImage, darkModeIcon: Bool) -> UIColor {

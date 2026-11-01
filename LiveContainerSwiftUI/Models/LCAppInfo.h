@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger, MultitaskSpecified){
 @property NSDate* lastLaunched;
 @property NSDate* installationDate;
 @property NSString* remark;
+@property bool useRemarkAsName;
 @property bool is32bit;
 @property(readonly) bool is32bitEmulator;
 @property UIColor* cachedColor;

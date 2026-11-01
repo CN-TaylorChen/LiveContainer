@@ -797,4 +797,17 @@
     [self save];
 }
 
+- (bool)useRemarkAsName {
+    if(_info[@"useRemarkAsName"] != nil) {
+        return [_info[@"useRemarkAsName"] boolValue];
+    } else {
+        return NO;
+    }
+}
+
+- (void)setUseRemarkAsName:(bool)useRemarkAsName {
+    _info[@"useRemarkAsName"] = [NSNumber numberWithBool:useRemarkAsName];
+    [self save];
+}
+
 @end

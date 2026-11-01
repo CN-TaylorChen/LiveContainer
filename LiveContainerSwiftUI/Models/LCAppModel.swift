@@ -119,6 +119,18 @@ class LCAppModel: ObservableObject, Hashable {
             appInfo.remark = uiRemark
         }
     }
+
+    /// When enabled, the app list title uses the remark instead of the original display name.
+    @Published var uiUseRemarkAsName : Bool {
+        didSet {
+            appInfo.useRemarkAsName = uiUseRemarkAsName
+        }
+    }
+
+    /// Memory-only deduplication info, set by the app list before rendering.
+    /// 0/0 means this app's name is unique; index is 1-based within its duplicate group.
+    @Published var uiDuplicateIndex: Int = 0
+    @Published var uiDuplicateTotal: Int = 0
     
     @Published var uiIsMultitaskModeSpecificed : MultitaskSpecified {
         didSet {
@@ -141,6 +153,17 @@ class LCAppModel: ObservableObject, Hashable {
     public var displayName: String {
         get {
             return appInfo.displayName() ?? "?"
+        }
+    }
+
+    /// The name shown on the app banner. Uses the remark as the title when
+    /// `uiUseRemarkAsName` is enabled and a remark is present, otherwise the original name.
+    public var uiDisplayName: String {
+        get {
+            if uiUseRemarkAsName, !uiRemark.isEmpty {
+                return uiRemark
+            }
+            return displayName
         }
     }
     
@@ -191,6 +214,7 @@ class LCAppModel: ObservableObject, Hashable {
         self.uiSelected32BitEmulator = appInfo.selected32BitEmulator ?? ""
         self.uiSpoofSDKVersion = appInfo.spoofSDKVersion
         self.uiRemark = appInfo.remark ?? ""
+        self.uiUseRemarkAsName = appInfo.useRemarkAsName
         self.uiIs32bit = appInfo.is32bit
         self.uiIs32bitEmulator = appInfo.is32bitEmulator
         for container in uiContainers {

@@ -63,6 +63,10 @@ struct LCAppSettingsView: View {
                         .foregroundColor(.gray)
                         .multilineTextAlignment(.trailing)
                 }
+                Toggle(isOn: $model.uiUseRemarkAsName) {
+                    Text("lc.appSettings.useRemarkAsName".loc)
+                }
+                .help("lc.appSettings.useRemarkAsNameDesc".loc)
                 if !model.uiIsShared {
                     Menu {
                         Picker(selection: $model.uiTweakFolder , label: Text("")) {
